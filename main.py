@@ -2,11 +2,17 @@ import ttkbootstrap as ttk
 from helpers import gui_creation
 from ttkbootstrap.constants import *
 
-user_inputs = []
+user_input_objects = []
 
 
 def clear_gui():
-    pass
+    for user_input in user_input_objects:
+        if isinstance(user_input, ttk.DateEntry):
+            user_input.entry.delete(0, END)
+        elif isinstance(user_input, ttk.Entry):
+            user_input.delete(0, END)
+        elif isinstance(user_input, ttk.Text):
+            user_input.delete("1.0", "end-1c")
 
 
 def submit_entry():
@@ -17,14 +23,22 @@ def generate_fn():
     pass
 
 
+def gather_database_fields():
+    pass
+
+
 def gather_inputs():
-    for user_input in user_inputs:
+    user_inputs = []
+
+    for user_input in user_input_objects:
         if isinstance(user_input, ttk.DateEntry):
-            print(user_input.entry.get())
+            user_inputs.append(user_input.entry.get())
         elif isinstance(user_input, ttk.Entry):
-            print(user_input.get())
+            user_inputs.append(user_input.get())
         elif isinstance(user_input, ttk.Text):
-            print(user_input.get("1.0", "end-1c"))
+            user_inputs.append(user_input.get("1.0", "end-1c"))
+
+    return user_inputs
 
 
 def main() -> None:
@@ -71,7 +85,7 @@ def main() -> None:
         else:
             bootstyle = SECONDARY
 
-        user_inputs.append(
+        user_input_objects.append(
             gui_creation.create_date_entry(
                 frame=frame, label_text=label, name=name, bootstyle=bootstyle
             )
@@ -79,7 +93,7 @@ def main() -> None:
 
     for label, name in single_line_labels.items():
         frame = gui_creation.create_frame(app)
-        user_inputs.append(
+        user_input_objects.append(
             gui_creation.create_label_entry(
                 frame=frame, label_text=label, name=name
             )
@@ -87,7 +101,7 @@ def main() -> None:
 
     for label, name in multi_line_labels.items():
         frame = gui_creation.create_frame(app)
-        user_inputs.append(
+        user_input_objects.append(
             gui_creation.create_label_entry(
                 frame=frame, label_text=label, name=name, multi_line=True
             )
