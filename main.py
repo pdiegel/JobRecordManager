@@ -1,12 +1,41 @@
 import ttkbootstrap as ttk
-from helpers import gui_creation
+from helpers import gui_creation, user_input_storage, database_connector
+from helpers import job_number_storage, job_number_generator
 from ttkbootstrap.constants import *
 
-user_input_objects = []
+database_path = r"\\Server\access\Database Backup\MainDB_be.accdb"
+input_storage = user_input_storage.UserInputStorage()
+job_number_storage = job_number_storage.JobNumbers()
+job_number_generator = job_number_generator.JobNumberGenerator(
+    job_number_storage
+)
+access_database = database_connector.DatabaseConnection(database_path)
+
+# Execute a SELECT query.
+existing_jobs = access_database.execute_query(
+    "SELECT [Job Number] FROM [Existing Jobs]"
+)
+
+active_jobs = access_database.execute_query(
+    "SELECT [Job Number] FROM [Active Jobs]"
+)
+
+job_number_storage.add_existing_job_numbers(existing_jobs)
+job_number_storage.add_active_job_numbers(active_jobs)
+job_number_storage.add_unused_job_number(
+    job_number_generator.unused_job_number
+)
+# print(job_number_storage.get_existing_job_numbers())
+# print(job_number_storage.get_active_job_numbers())
+
+print(job_number_storage.unused_job_number)
 
 
-def clear_gui():
-    for user_input in user_input_objects:
+def clear_gui(
+    input_storage: user_input_storage.UserInputStorage = input_storage,
+) -> None:
+    print(input_storage.inputs)
+    for user_input in input_storage.input_objects:
         if isinstance(user_input, ttk.DateEntry):
             user_input.entry.delete(0, END)
         elif isinstance(user_input, ttk.Entry):
@@ -19,26 +48,8 @@ def submit_entry():
     pass
 
 
-def generate_fn():
-    pass
-
-
 def gather_database_fields():
     pass
-
-
-def gather_inputs():
-    user_inputs = []
-
-    for user_input in user_input_objects:
-        if isinstance(user_input, ttk.DateEntry):
-            user_inputs.append(user_input.entry.get())
-        elif isinstance(user_input, ttk.Entry):
-            user_inputs.append(user_input.get())
-        elif isinstance(user_input, ttk.Text):
-            user_inputs.append(user_input.get("1.0", "end-1c"))
-
-    return user_inputs
 
 
 def main() -> None:
@@ -49,6 +60,8 @@ def main() -> None:
         maxsize=(window_width, window_height),
         minsize=(window_width, window_height),
     )
+
+    user_input_objects = []
 
     label = ttk.Label(app, text="Red Stake File Entry")
     label.pack(pady=10)
@@ -72,8 +85,8 @@ def main() -> None:
 
     buttons = {
         "Submit": submit_entry,
-        "Generate FN": generate_fn,
-        "Gather Info": gather_inputs,
+        "Generate FN": print,
+        "Gather Info": gather_database_fields,
         "Clear": clear_gui,
     }
 
@@ -112,6 +125,8 @@ def main() -> None:
         gui_creation.create_button(
             frame=frame, text=button_label, command=button_function
         )
+
+    input_storage.add_inputs(user_input_objects)
 
     app.mainloop()
 

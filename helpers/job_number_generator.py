@@ -1,52 +1,50 @@
 import datetime
-from helpers.job_number_storage import JobNumbers
-
-
-def generate_new_fn(self):
-    """Generates a new, unassigned file number"""
-
-    highest_existing_fn = max(file_numbers)
-    last_four_digits = str(int(highest_existing_fn[4:8]) + 1)
-    if len(last_four_digits) < 4:
-        last_four_digits = "0" + last_four_digits
-    new_fn = first_four + last_four_digits
+from .job_number_storage import JobNumbers
 
 
 class JobNumberGenerator:
-    def __init__(self, job_number_storage: JobNumbers):
-        self.job_number_storage = job_number_storage
-        self.existing_job_numbers = self.job_number_storage.get_job_numbers()
+    def __init__(self, job_storage: JobNumbers):
+        self.job_storage = job_storage
 
-    @property
-    def job_number_prefix(self, num_previous_months: int = 0) -> str:
+    def get_job_number_prefix(self, num_previous_months: int = 0) -> str:
         now = datetime.datetime.now()
         year = now.year % 100
         month = now.month
 
         if num_previous_months > 0 and month > 1:
-            month = f"{int(month)-num_previous_months}"
+            month -= num_previous_months
+            if month < 1:
+                month += 12
 
-        job_number_prefix = f"{year}{month}"
+        job_number_prefix = f"{year:02d}{month:02d}"
         return job_number_prefix
 
     @property
-    def job_number_suffix(self):
-        job_number_prefix = self.job_number_prefix
-
-    @property
-    def unused_job_number(self):
-        while True:
+    def unused_job_number(self) -> str:
+        num_previous_months = 0
+        while num_previous_months < 12:
+            prefix = self.get_job_number_prefix(num_previous_months)
             job_numbers = [
                 number
-                for number in existing_job_numbers
-                if number.startswith(self.job_number_prefix())
+                for number in self.job_storage.get_existing_job_numbers()
+                if number.startswith(prefix)
             ]
             if len(job_numbers) == 0:
                 num_previous_months += 1
             else:
+                highest_existing_fn = max(job_numbers)
+                last_four_digits = str(
+                    int(highest_existing_fn[4:8]) + 1
+                ).zfill(4)
+                new_fn = self.get_job_number_prefix() + last_four_digits
                 break
+        else:
+            new_fn = self.get_job_number_prefix() + "0100"
 
-        return int(max(job_numbers)) + 1
+        return new_fn
 
 
-print(JobNumberGenerator().unused_job_number)
+if __name__ == "__main__":
+    job_number_storage = JobNumbers()  # Replace with actual JobNumbers object
+    job_number_generator = JobNumberGenerator(job_number_storage)
+    print(job_number_generator.unused_job_number)
