@@ -34,6 +34,9 @@ class DatabaseConnection:
                 cursor.execute(query)
             self.connection.commit()
 
+    def insert_new_job(self, job_number: str, user_inputs: dict):
+        print(user_inputs)
+
 
 """
 from helpers.database_connection import DatabaseConnection
