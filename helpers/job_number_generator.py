@@ -5,18 +5,18 @@ from .job_number_storage import JobNumbers
 class JobNumberGenerator:
     def __init__(self, job_storage: JobNumbers):
         self.job_storage = job_storage
+        self.now = datetime.datetime.now()
+        self.year = self.now.year % 100
+        self.month = self.now.month
 
     def get_job_number_prefix(self, num_previous_months: int = 0) -> str:
-        now = datetime.datetime.now()
-        year = now.year % 100
-        month = now.month
-
+        month = self.month
         if num_previous_months > 0 and month > 1:
             month -= num_previous_months
             if month < 1:
                 month += 12
 
-        job_number_prefix = f"{year:02d}{month:02d}"
+        job_number_prefix = f"{self.year:02d}{month:02d}"
         return job_number_prefix
 
     @property
@@ -26,7 +26,7 @@ class JobNumberGenerator:
             prefix = self.get_job_number_prefix(num_previous_months)
             job_numbers = [
                 number
-                for number in self.job_storage.get_existing_job_numbers()
+                for number in self.job_storage.get_current_year_job_numbers()
                 if number.startswith(prefix)
             ]
             if len(job_numbers) == 0:

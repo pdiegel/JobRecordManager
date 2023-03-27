@@ -1,4 +1,7 @@
 import pyodbc
+from data_collector.county_property_data import ParcelDataCollection
+
+from config import *
 
 
 class DatabaseConnection:
@@ -34,26 +37,81 @@ class DatabaseConnection:
                 cursor.execute(query)
             self.connection.commit()
 
-    def insert_new_job(self, job_number: str, user_inputs: dict):
-        print(user_inputs)
+    def insert_new_job(self, user_inputs: dict):
+        parcel = ParcelDataCollection(user_inputs["parcel_id"])
+        parcel_data = parcel.parcel_data
+        parcel_data["county"] = parcel.county
 
+        self.merge_user_inputs_into_parcel_data(user_inputs, parcel_data)
 
-"""
-from helpers.database_connection import DatabaseConnection
+        try:
+            self.create_new_job(parcel_data)
+        except pyodbc.IntegrityError as error:
+            print(error)
+            self.update_existing_job(parcel_data)
 
-# Replace this with the path to your Access database file.
-database_path = 'path/to/your/access/database.accdb'
+        try:
+            self.add_to_active_jobs(parcel_data)
+        except pyodbc.IntegrityError as error:
+            print(error)
 
-db_connection = DatabaseConnection(database_path)
-db_connection.connect()
+        self.connection.commit()
 
-# Execute a SELECT query.
-query_result = db_connection.execute_query('SELECT * FROM your_table_name')
-print(query_result)
+    def update_existing_job(self, parcel_data: dict):
+        sql_query = self.create_update_query(parcel_data)
+        self.execute_non_query(sql_query)
 
-# Execute an INSERT, UPDATE or DELETE query.
-db_connection.execute_non_query('UPDATE your_table_name SET column_name = ?
-WHERE id = ?', (new_value, record_id))
+    def merge_user_inputs_into_parcel_data(
+        self, user_inputs: dict, parcel_data: dict
+    ):
+        database_columns = set(
+            EXISTING_DB_COLUMN_ORDER + ACTIVE_DB_COLUMN_ORDER
+        )
 
-db_connection.close()
-"""
+        for column in database_columns:
+            if column in user_inputs and column not in parcel_data:
+                parcel_data[column] = user_inputs[column]
+            elif column not in parcel_data:
+                parcel_data[column] = None
+
+    def create_new_job(
+        self,
+        parcel_data: dict,
+    ):
+        self.execute_non_query(
+            "INSERT INTO [Existing Jobs]\
+ VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            [parcel_data[column] for column in EXISTING_DB_COLUMN_ORDER],
+        )
+
+    def create_update_query(self, parcel_data: dict) -> str:
+        """Creates and returns an SQL query to update the database
+        with new data."""
+
+        sql_query = f"""
+            UPDATE [Existing Jobs]
+            SET [Job Date] = '{parcel_data["job_date"]}',
+                [Parcel ID] = '{parcel_data["parcel_id"]}',
+                [subdivision] = '{parcel_data["subdivision"]}',
+                [Lot] = '{parcel_data["lot"]}',
+                [block] = '{parcel_data["block"]}',
+                [Plat Book] = '{parcel_data["plat_book"]}',
+                [Plat Page] = '{parcel_data["plat_page"]}',
+                [Legal Description] = '{parcel_data["legal_description"]}',
+                [Entry By] = '{parcel_data["entry_by"]}',
+                [Additional Information] = '{parcel_data["additional_info"]}',
+                [Customer Contact Information] = '{
+                    parcel_data["contact_info"]}'
+            WHERE [Job Number] = '{parcel_data["job_number"]}'
+            """
+        return sql_query
+
+    def add_to_active_jobs(self, parcel_data: dict) -> str:
+        """Creates and returns an SQL query to update the database
+        with new data."""
+
+        self.execute_non_query(
+            "INSERT INTO [Active Jobs]\
+ VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            [parcel_data[column] for column in ACTIVE_DB_COLUMN_ORDER],
+        )
