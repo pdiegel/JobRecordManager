@@ -11,6 +11,9 @@ class MockJobNumberStorage(JobNumbers):
     def get_existing_job_numbers(self):
         return self.job_numbers
 
+    def get_current_year_job_numbers(self):
+        return self.job_numbers
+
 
 class TestJobNumberGenerator(unittest.TestCase):
     def test_get_job_number_prefix(self):

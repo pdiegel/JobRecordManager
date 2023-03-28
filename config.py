@@ -1,5 +1,5 @@
 WINDOW_WIDTH = 500
-WINDOW_HEIGHT = 555
+WINDOW_HEIGHT = 600
 
 DATABASE_PATH = r"\\Server\access\Database Backup\MainDB_be.accdb"
 
