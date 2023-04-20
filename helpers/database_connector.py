@@ -1,5 +1,5 @@
 import pyodbc
-from county_property_data import ParcelDataCollection
+from parcel_data_collector.county_property_data import ParcelDataCollection
 
 from config import *
 
