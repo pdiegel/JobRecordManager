@@ -1,5 +1,9 @@
+"""This module contains the Controller class.
+The Controller class is used to manage the application's data and user
+input. It is responsible for updating the GUI and the database."""
+
 import ttkbootstrap as ttk
-from ttkbootstrap.constants import *
+from ttkbootstrap.constants import END
 
 from config import DATABASE_PATH
 from helpers.database_connector import DatabaseConnection
@@ -9,6 +13,9 @@ from helpers.user_input_storage import UserInputStorage
 
 
 class Controller:
+    """This class is used to manage the application's data and user
+    input."""
+
     def __init__(self):
         self.input_storage = UserInputStorage()
         self.job_storage = JobNumbers()

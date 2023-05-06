@@ -1,5 +1,5 @@
 import unittest
-from typing import List
+
 from helpers.job_number_storage import JobNumbers
 
 example_job_numbers = ["16030171", "23010111", "93121259"]

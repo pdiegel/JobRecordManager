@@ -1,3 +1,5 @@
+"""This module contains the configuration variables for the application."""
+
 WINDOW_WIDTH = 500
 WINDOW_HEIGHT = 600
 

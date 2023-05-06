@@ -1,17 +1,15 @@
-from functools import partial
-
+"""This module contains the main function for the Red Stake File Entry
+application."""
 import ttkbootstrap as ttk
-from ttkbootstrap.constants import *
 
-from config import *
+from config import WINDOW_HEIGHT, WINDOW_WIDTH
 from helpers import gui_creation as gui
 from helpers.controller import Controller
 
 
 def create_input_fields(app: ttk.Window, controller: Controller) -> None:
-    """
-    Creates input fields and stores them in the input_storage object.
-    """
+    """Creates input fields and stores them in the input_storage object."""
+
     date_input_labels = {
         "Job Date": "job_date",
         "Fieldwork Date": "fieldwork_date",
@@ -45,9 +43,7 @@ def create_input_fields(app: ttk.Window, controller: Controller) -> None:
 def create_buttons_and_commands(
     app: ttk.Window, controller: Controller
 ) -> None:
-    """
-    Creates buttons and assigns their commands.
-    """
+    """Creates buttons and assigns their commands."""
     buttons_and_commands = {
         "Submit": controller.submit_user_input,
         "Generate FN": controller.update_job_number_display,
@@ -59,9 +55,7 @@ def create_buttons_and_commands(
 
 
 def configure_main_window(app: ttk.Window) -> None:
-    """
-    Configures the main application window.
-    """
+    """Configures the main application window."""
     label = ttk.Label(app, text="Red Stake File Entry")
     label.pack(pady=10)
     label.config(font=("Arial", 20, "bold"))
@@ -88,9 +82,6 @@ def initialize_app() -> None:
     configure_main_window(app)
     create_input_fields(app, controller)
     create_buttons_and_commands(app, controller)
-
-    # For manual testing purposes.
-    controller.input_storage.input_objects["job_number"].insert(0, "23030160")
 
     app.mainloop()
 

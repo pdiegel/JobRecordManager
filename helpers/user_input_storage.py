@@ -1,17 +1,16 @@
+"""This module contains the UserInputStorage class, which is used to
+store user input objects and their values."""
 from typing import Dict, TypeAlias, Union
 
 import ttkbootstrap as ttk
-from ttkbootstrap.constants import *
 
 # Define a type alias for the input objects
 InputObject: TypeAlias = Union[ttk.DateEntry, ttk.Entry, ttk.Text]
 
 
 class UserInputStorage:
-    """
-    A class for managing and storing user input objects and their
-    values.
-    """
+    """This class manages and stores user input objects and their
+    values."""
 
     def __init__(self, input_objects: Dict[str, InputObject] = None) -> None:
         """

@@ -1,3 +1,5 @@
+"""This module contains functions for creating GUI elements."""
+
 from typing import Tuple, Union
 
 import ttkbootstrap as ttk

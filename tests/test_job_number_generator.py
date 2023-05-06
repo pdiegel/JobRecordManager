@@ -1,7 +1,8 @@
 import unittest
 from datetime import datetime
-from helpers.job_number_storage import JobNumbers
+
 from helpers.job_number_generator import JobNumberGenerator
+from helpers.job_number_storage import JobNumbers
 
 
 class MockJobNumberStorage(JobNumbers):
@@ -47,7 +48,7 @@ class TestJobNumberGenerator(unittest.TestCase):
         job_storage = MockJobNumberStorage(existing_job_numbers)
         job_number_generator = JobNumberGenerator(job_storage)
 
-        expected_job_number = f"23030112"
+        expected_job_number = "23030112"
         self.assertEqual(
             job_number_generator.unused_job_number, expected_job_number
         )

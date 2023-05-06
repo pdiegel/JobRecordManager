@@ -1,8 +1,13 @@
+"""This module contains the JobNumberGenerator class, which is used to
+generate new job numbers."""
+
 import datetime
 from .job_number_storage import JobNumbers
 
 
 class JobNumberGenerator:
+    """This class is used to generate new job numbers."""
+
     def __init__(self, job_storage: JobNumbers):
         self.job_storage = job_storage
         self.now = datetime.datetime.now()
@@ -10,6 +15,8 @@ class JobNumberGenerator:
         self.month = self.now.month
 
     def get_job_number_prefix(self, num_previous_months: int = 0) -> str:
+        """Returns the prefix for a job number based on the current year
+        and month."""
         month = self.month
         if num_previous_months > 0 and month > 1:
             month -= num_previous_months
@@ -21,6 +28,8 @@ class JobNumberGenerator:
 
     @property
     def unused_job_number(self) -> str:
+        """Returns the next unused job number based on the current year
+        and month."""
         num_previous_months = 0
         while num_previous_months < 12:
             prefix = self.get_job_number_prefix(num_previous_months)
@@ -42,52 +51,3 @@ class JobNumberGenerator:
             new_fn = self.get_job_number_prefix() + "0100"
 
         return new_fn
-
-
-class JobNumbers:
-    def __init__(self):
-        self.current_year_job_numbers = set()
-        self.existing_job_numbers = set()
-        self.active_job_numbers = set()
-        self.unused_job_number = ""
-
-    def add_job_number(self, job_number: str):
-        self.existing_job_numbers.add(job_number)
-        self.active_job_numbers.add(job_number)
-
-    def remove_job_number(self, job_number: str):
-        self.existing_job_numbers.remove(job_number)
-
-    def add_existing_job_numbers(self, job_numbers: tuple):
-        # Pulling from access database as a tuple, with job number being
-        # the first element.
-        job_numbers = [job_number[0] for job_number in job_numbers]
-        self.existing_job_numbers.update(job_numbers)
-
-    def add_active_job_numbers(self, job_numbers: tuple):
-        # Pulling from access database as a tuple, with job number being
-        # the first element.
-        job_numbers = [job_number[0] for job_number in job_numbers]
-        self.active_job_numbers.update(job_numbers)
-
-    def add_current_year_job_numbers(self, job_numbers: tuple):
-        # Pulling from access database as a tuple, with job number being
-        # the first element.
-        job_numbers = [job_number[0] for job_number in job_numbers]
-        self.current_year_job_numbers.update(job_numbers)
-
-    def clear_job_numbers(self):
-        self.existing_job_numbers.clear()
-        self.active_job_numbers.clear()
-
-    def get_existing_job_numbers(self) -> list[str]:
-        return self.existing_job_numbers
-
-    def get_active_job_numbers(self) -> list[str]:
-        return self.active_job_numbers
-
-    def get_current_year_job_numbers(self) -> list[str]:
-        return self.current_year_job_numbers
-
-    def add_unused_job_number(self, job_number: str):
-        self.unused_job_number = job_number
