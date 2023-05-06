@@ -1,7 +1,7 @@
-from typing import Callable, Dict, Tuple, Union
+from typing import Tuple, Union
 
 import ttkbootstrap as ttk
-from ttkbootstrap.constants import *
+from ttkbootstrap.constants import LEFT, RIGHT, X
 
 # Define a type alias for a widget font
 WidgetFont = Tuple[str, int]
@@ -254,7 +254,10 @@ def create_button(
     font_style.configure("Bold.TButton", font=font)
 
     button = ttk.Button(
-        frame, text=text, command=command, style="Bold.TButton"
+        frame,
+        text=text,
+        command=command,
+        style="Bold.TButton",
     )
     button.pack(padx=padx, pady=pady, side=side, ipady=height, ipadx=width)
     return button
@@ -286,7 +289,8 @@ def create_date_entries(app: ttk.Window, date_labels: dict) -> dict:
 
 
 def create_single_line_entries(
-    app: ttk.Window, single_line_labels: dict
+    app: ttk.Window,
+    single_line_labels: dict,
 ) -> dict:
     """
     Create single-line entries and add them to a frame in the app.
@@ -313,7 +317,8 @@ def create_single_line_entries(
 
 
 def create_multi_line_entries(
-    app: ttk.Window, multi_line_labels: dict
+    app: ttk.Window,
+    multi_line_labels: dict,
 ) -> dict:
     """
     Create multi-line entries and add them to a frame in the app.
